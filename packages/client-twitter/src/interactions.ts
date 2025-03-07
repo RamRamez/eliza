@@ -123,7 +123,7 @@ export class TwitterInteractionClient {
             // Check for mentions
             const mentionCandidates = (
                 await this.client.fetchSearchTweets(
-                    `@${twitterUsername}`,
+                    `@${twitterUsername} -from:${twitterUsername}`,
                     20,
                     SearchMode.Latest
                 )
@@ -277,7 +277,7 @@ export class TwitterInteractionClient {
                     );
 
                     const message = {
-                        content: { 
+                        content: {
                             text: tweet.text,
                             imageUrls: tweet.photos?.map(photo => photo.url) || []
                         },
