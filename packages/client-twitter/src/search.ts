@@ -87,7 +87,8 @@ export class TwitterSearchClient {
             );
             elizaLogger.log("Search tweets fetched");
 
-            const homeTimeline = await this.client.fetchHomeTimeline(50);
+            // const homeTimeline = await this.client.fetchHomeTimeline(50);
+            const homeTimeline = []
 
             await this.client.cacheTimeline(homeTimeline);
 
@@ -115,7 +116,7 @@ export class TwitterSearchClient {
             const prompt = `
   Here are some tweets related to the search term "${searchTerm}":
 
-  ${[...slicedTweets, ...homeTimeline]
+  ${[...slicedTweets]
       .filter((tweet) => {
           // ignore tweets where any of the thread tweets contain a tweet by the bot
           const thread = tweet.thread;
@@ -153,6 +154,11 @@ export class TwitterSearchClient {
                     tweet.id.toString().includes(tweetId) ||
                     tweetId.includes(tweet.id.toString())
             );
+
+            console.log('---------------------');
+            console.log('selectedTweet', selectedTweet.text);
+            console.log('---------------------');
+
 
             if (!selectedTweet) {
                 elizaLogger.warn("No matching tweet found for the selected ID");
