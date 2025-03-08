@@ -160,6 +160,8 @@ import { quickIntelPlugin } from "@elizaos/plugin-quick-intel";
 
 import { trikonPlugin } from "@elizaos/plugin-trikon";
 import arbitragePlugin from "@elizaos/plugin-arbitrage";
+import givethDBPlugin from "@elizaos/plugin-giveth-db";
+
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
@@ -1018,6 +1020,7 @@ export async function createAgent(
         character,
         // character.plugins are handled when clients are added
         plugins: [
+            givethDBPlugin,
             parseBooleanFromText(getSecret(character, "BITMIND")) &&
             getSecret(character, "BITMIND_API_TOKEN")
                 ? bittensorPlugin
