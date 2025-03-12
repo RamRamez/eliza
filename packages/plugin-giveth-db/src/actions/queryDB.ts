@@ -5,8 +5,8 @@ import {
     Action,
     composeContext, generateText, ModelClass,
 } from "@elizaos/core";
-import {cleanSqlQuery, queryRawSql} from "../helpers/helpers.ts";
-import {givethEntitiesPrompt} from "../helpers/givethEntitiesPrompt.ts";
+import {anthropicGenerateText, cleanSqlQuery, queryGivethDB} from "../helpers/helpers.ts";
+import {mainGivethEntitiesPrompt} from "../helpers/mainGivethEntitiesPrompt.ts";
 
 export const queryDBAction: Action = {
     name: "QUERY_DB",
@@ -38,18 +38,22 @@ export const queryDBAction: Action = {
             const state = { sqlQuery: _message.content.text }
             const context = composeContext({
                 state: state as any,
-                template: givethEntitiesPrompt,
+                template: mainGivethEntitiesPrompt,
             });
-            const rawSqlQuery = await generateText({
+            const rawGPTQuery = await generateText({
                 runtime: _runtime,
                 context,
                 modelClass: ModelClass.LARGE,
             });
-            await _callback({text: `Executing query: ${rawSqlQuery}`}); // Not working on web UI for some reason but working on Discord
+            const rawAnthropicQuery = await anthropicGenerateText(context);
             console.log('------------------')
-            console.log("\nExecuting query: \n", rawSqlQuery);
+            console.log('Anthropic query:\n', cleanSqlQuery(rawAnthropicQuery));
             console.log('------------------')
-            const res = await queryRawSql(cleanSqlQuery(rawSqlQuery));
+            await _callback({text: `Executing query: ${rawGPTQuery}`}); // Not working on web UI for some reason but working on Discord
+            console.log('------------------')
+            console.log("GPT query:\n", cleanSqlQuery(rawGPTQuery));
+            console.log('------------------')
+            const res = await queryGivethDB(cleanSqlQuery(rawAnthropicQuery));
             const jsonFormattedRes = "```json\n" + JSON.stringify(res, null, 2) + "\n```";
             await _callback({text: 'Query result:\n' + jsonFormattedRes});
         } catch (e) {
